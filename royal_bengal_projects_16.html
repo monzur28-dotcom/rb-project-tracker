@@ -340,7 +340,7 @@ tbody td { padding: 12px 14px; vertical-align: middle; }
       <span class="urole" id="u-role"></span>
     </div>
     <button class="btn btn-ghost btn-sm" id="admin-btn" style="display:none" onclick="openAdmin()">⚙ Admin</button>
-    <button class="btn btn-ghost btn-sm" id="db-btn" onclick="openSetup()" title="Configure Supabase" style="font-size:11px;padding:5px 9px">🗄 DB</button>
+    <button class="btn btn-ghost btn-sm" id="db-btn" onclick="openSetup()" title="Configure Supabase" style="font-size:11px;padding:5px 9px;display:none">🗄 DB</button>
     <button class="btn btn-ghost btn-sm" id="chpass-btn" style="display:none" onclick="openChPass()">🔑 Password</button>
     <button class="btn btn-ghost btn-sm" id="logout-btn" style="display:none" onclick="doLogout()">Sign Out</button>
     <button class="btn btn-primary btn-sm" id="login-btn" onclick="openLogin()">Staff Login</button>
@@ -853,6 +853,7 @@ async function doLogin() {
     document.getElementById('logout-btn').style.display   = 'inline-flex';
     document.getElementById('login-btn').style.display    = 'none';
     document.getElementById('admin-btn').style.display    = u.role === 'admin' ? 'inline-flex' : 'none';
+    document.getElementById('db-btn').style.display       = u.role === 'admin' ? 'inline-flex' : 'none';
     document.getElementById('add-proj-btn').style.display = 'inline-flex';
     document.getElementById('chpass-btn').style.display   = 'inline-flex';
     document.getElementById('f-dev').style.display = u.role === 'admin' ? '' : 'none';
@@ -872,6 +873,7 @@ function doLogout() {
   document.getElementById('user-chip').style.display    = 'none';
   document.getElementById('logout-btn').style.display   = 'none';
   document.getElementById('admin-btn').style.display    = 'none';
+  document.getElementById('db-btn').style.display       = 'none';
   document.getElementById('login-btn').style.display    = 'inline-flex';
   document.getElementById('add-proj-btn').style.display = 'none';
   document.getElementById('chpass-btn').style.display   = 'none';
