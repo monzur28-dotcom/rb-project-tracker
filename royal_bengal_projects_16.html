@@ -789,7 +789,7 @@ function renderTable() {
 
   const tbody = document.getElementById('proj-tbody');
   if (!rows.length) {
-    tbody.innerHTML = '<tr class="empty-row"><td colspan="8">No projects match your filter.</td></tr>';
+    tbody.innerHTML = '<tr class="empty-row"><td colspan="10">No projects match your filter.</td></tr>';
     renderStats();
     return;
   }
@@ -809,7 +809,7 @@ function renderTable() {
         <td class="td-sl">${p.sl}</td>
         <td class="td-name">${esc(p.project_name)}</td>
         <td style="color:var(--muted);font-size:12px;white-space:nowrap">${esc(p.start_date || '—')}</td>
-        <td style="font-size:12px;white-space:nowrap">${p.start_date ? `<span style="background:var(--surface2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:8px">${Math.floor((Date.now()-new Date(p.start_date))/(86400000))}d</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+        <td style="font-size:12px;white-space:nowrap">${p.start_date ? `<span style="background:var(--surface2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:8px">${Math.floor((Date.now() - new Date(p.start_date + 'T00:00:00')) / 86400000)}d</span>` : '<span style="color:var(--muted)">—</span>'}</td>
         <td class="td-dev">${esc(p.developer_name || '—')}</td>
         <td>${p.current_version ? `<span class="td-version">${esc(p.current_version)}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
         <td style="color:var(--muted);font-size:12px">${esc(p.release_date || '—')}</td>
