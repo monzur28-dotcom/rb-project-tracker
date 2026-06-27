@@ -694,6 +694,32 @@ async function init() {
   try {
     await loadAll();
     renderStats();
+    const saved = localStorage.getItem('rb_session');
+    if (saved) {
+      try {
+        const u = JSON.parse(saved);
+        // Re-validate user still exists in DB
+        const fresh = users.find(x => x.user_id === u.user_id && x.pass === u.pass);
+        if (fresh) {
+          currentUser = fresh;
+          document.getElementById('u-avatar').textContent = fresh.name.charAt(0).toUpperCase();
+          document.getElementById('u-name').textContent   = fresh.name;
+          document.getElementById('u-role').textContent   = fresh.role === 'admin' ? 'PM' : 'Dev';
+          document.getElementById('user-chip').style.display    = 'flex';
+          document.getElementById('logout-btn').style.display   = 'inline-flex';
+          document.getElementById('login-btn').style.display    = 'none';
+          document.getElementById('admin-btn').style.display    = fresh.role === 'admin' ? 'inline-flex' : 'none';
+          document.getElementById('db-btn').style.display       = fresh.role === 'admin' ? 'inline-flex' : 'none';
+          document.getElementById('add-proj-btn').style.display = 'inline-flex';
+          document.getElementById('chpass-btn').style.display   = 'inline-flex';
+          document.getElementById('f-dev').style.display        = fresh.role === 'admin' ? '' : 'none';
+        } else {
+          localStorage.removeItem('rb_session');
+        }
+      } catch(e) {
+        localStorage.removeItem('rb_session');
+      }
+    }
     renderTable();
     buildDevFilter();
   } catch(e) {
@@ -867,6 +893,7 @@ async function doLogin() {
     if (!result.length) { toast('Wrong ID or password', 'error'); return; }
     const u = result[0];
     currentUser = u;
+    localStorage.setItem('rb_session', JSON.stringify(u));
     document.getElementById('u-avatar').textContent = u.name.charAt(0).toUpperCase();
     document.getElementById('u-name').textContent   = u.name;
     document.getElementById('u-role').textContent   = u.role === 'admin' ? 'PM' : 'Dev';
@@ -891,6 +918,7 @@ async function doLogin() {
 
 function doLogout() {
   currentUser = null;
+  localStorage.removeItem('rb_session');
   document.getElementById('user-chip').style.display    = 'none';
   document.getElementById('logout-btn').style.display   = 'none';
   document.getElementById('admin-btn').style.display    = 'none';
@@ -1239,6 +1267,8 @@ async function saveChPass() {
     // Update local cache
     const idx = users.findIndex(u => u.id === currentUser.id);
     if (idx !== -1) users[idx].pass = newPass;
+    currentUser.pass = newPass;
+    localStorage.setItem('rb_session', JSON.stringify(currentUser));
     closeChPass();
     toast('Password updated ✓', 'success');
   } catch(e) {
