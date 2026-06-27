@@ -448,6 +448,13 @@ tbody td { padding: 12px 14px; vertical-align: middle; }
         <input class="form-i" id="e-start-date" type="date" />
       </div>
       <div class="form-g">
+        <label class="form-l" style="display:flex;align-items:center;gap:6px">
+          Live / Ready Date
+          <span style="font-size:10px;color:var(--muted);font-weight:400">(stops day counter)</span>
+        </label>
+        <input class="form-i" id="e-stopped-date" type="date" />
+      </div>
+      <div class="form-g">
         <label class="form-l">Release Date</label>
         <input class="form-i" id="e-release" placeholder="e.g. 2026-06-20" />
       </div>
@@ -809,7 +816,13 @@ function renderTable() {
         <td class="td-sl">${p.sl}</td>
         <td class="td-name">${esc(p.project_name)}</td>
         <td style="color:var(--muted);font-size:12px;white-space:nowrap">${esc(p.start_date || '—')}</td>
-        <td style="font-size:12px;white-space:nowrap">${p.start_date ? `<span style="background:var(--surface2);color:var(--accent);font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:8px">${Math.floor((Date.now() - new Date(p.start_date + 'T00:00:00')) / 86400000)}d</span>` : '<span style="color:var(--muted)">—</span>'}</td>
+        <td style="font-size:12px;white-space:nowrap">${p.start_date ? (() => {
+          const endMs  = p.stopped_date ? new Date(p.stopped_date + 'T00:00:00').getTime() : Date.now();
+          const days   = Math.floor((endMs - new Date(p.start_date + 'T00:00:00')) / 86400000);
+          const stopped = p.stopped_date || p.status === 'completed' || p.status === 'live';
+          const tip    = p.stopped_date ? `Stopped on ${p.stopped_date}` : (stopped ? 'Counter stopped' : 'Days running');
+          return `<span style="background:var(--surface2);color:${stopped ? 'var(--muted)' : 'var(--accent)'};font-family:var(--mono);font-size:11px;padding:2px 7px;border-radius:8px" title="${tip}">${days}d${stopped ? ' ✓' : ''}</span>`;
+        })() : '<span style="color:var(--muted)">—</span>'}</td>
         <td class="td-dev">${esc(p.developer_name || '—')}</td>
         <td>${p.current_version ? `<span class="td-version">${esc(p.current_version)}</span>` : '<span style="color:var(--muted)">—</span>'}</td>
         <td style="color:var(--muted);font-size:12px">${esc(p.release_date || '—')}</td>
@@ -894,7 +907,7 @@ function doLogout() {
 // ══════════════════════════════════════════════════════════════════════════════
 function openEditModal(id) {
   editingId = id;
-  const fields = ['e-name','e-dev','e-details','e-version','e-start-date','e-release','e-blocker','e-link','e-telegram','e-railway','e-code'];
+  const fields = ['e-name','e-dev','e-details','e-version','e-start-date','e-stopped-date','e-release','e-blocker','e-link','e-telegram','e-railway','e-code'];
 
   if (id !== null) {
     const p = projects.find(p => p.id === id);
@@ -910,6 +923,7 @@ function openEditModal(id) {
     document.getElementById('e-details').value  = p.project_details || '';
     document.getElementById('e-version').value  = p.current_version || '';
     document.getElementById('e-start-date').value = p.start_date || '';
+    document.getElementById('e-stopped-date').value = p.stopped_date || '';
     document.getElementById('e-release').value  = p.release_date || '';
     document.getElementById('e-blocker').value  = p.blocker || '';
     document.getElementById('e-status').value   = p.status || 'in_progress';
@@ -945,6 +959,7 @@ async function saveProject() {
     project_details:   document.getElementById('e-details').value.trim(),
     current_version:   document.getElementById('e-version').value.trim(),
     start_date:        document.getElementById('e-start-date').value || null,
+    stopped_date:      document.getElementById('e-stopped-date').value || null,
     release_date:      document.getElementById('e-release').value.trim(),
     blocker:           document.getElementById('e-blocker').value.trim(),
     status:            document.getElementById('e-status').value,
